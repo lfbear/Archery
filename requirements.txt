@@ -37,3 +37,6 @@ qrcode==7.3.1
 django-environ==0.8.1
 alibabacloud_dysmsapi20170525==2.0.9
 tencentcloud-sdk-python==3.0.656
+sqlparse==0.4.3
+paramiko==2.11.0
+Authlib==1.1.0

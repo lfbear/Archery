@@ -4,6 +4,8 @@ from common import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("google-login", views.google_login),
+    path("google-auth", views.google_auth),
     path("api/", include(("sql_api.urls", "sql_api"), namespace="sql_api")),
     path("", include(("sql.urls", "sql"), namespace="sql")),
 ]

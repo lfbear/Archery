@@ -17,6 +17,7 @@ env = environ.Env(
     DATABASE_URL=(str, "mysql://root:@127.0.0.1:3306/archery"),
     CACHE_URL=(str, "redis://127.0.0.1:6379/0"),
     ENABLE_LDAP=(bool, False),
+    GOOGLE_OAUTH=(bool, False),
     AUTH_LDAP_ALWAYS_UPDATE_USER=(bool, True),
     AUTH_LDAP_USER_ATTR_MAP=(
         dict,
@@ -227,6 +228,26 @@ SIMPLE_JWT = {
     "SIGNING_KEY": SECRET_KEY,
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
+
+# Google OAuth
+GoogleOAuth = None
+ENABLE_GOOGLE_OAUTH = env("GOOGLE_OAUTH", False)
+if ENABLE_GOOGLE_OAUTH:
+    AUTHLIB_OAUTH_CLIENTS = {
+        'google': {
+            'client_id': env("GOOGLE_CLIENT_ID", default=None),
+            'client_secret': env("GOOGLE_CLIENT_SECRET", default=None),
+        }
+    }
+    from authlib.integrations.django_client import OAuth
+    GoogleOAuth = OAuth()
+    GoogleOAuth.register(
+        name='google',
+        server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+        client_kwargs={
+            'scope': 'openid email profile'
+        }
+    )
 
 # LDAP
 ENABLE_LDAP = env("ENABLE_LDAP", False)

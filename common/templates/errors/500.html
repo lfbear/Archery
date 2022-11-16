@@ -2,4 +2,8 @@
 
 {% block content %}
     <h1>Server Error (500)</h1>
+    {% block content.title %}
+    <h3>{{ content.title }}</h3>
+    <p>{{ content.message | default:"" }}</p>
+    {% endblock content.title %}
 {% endblock content %}
