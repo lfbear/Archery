@@ -16,7 +16,7 @@ RUN cd /opt \
     && mv /opt/my2sql /opt/archery/src/plugins/
 
 #port
-EXPOSE 9123
+EXPOSE 8888
 
 #start service
 ENTRYPOINT bash /opt/archery/src/docker/startup.sh && bash

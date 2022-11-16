@@ -5,8 +5,10 @@
 @file: views.py
 @time: 2019/12/21
 """
+import urllib
+from urllib.parse import urlparse
 
-from django.shortcuts import render, reverse, redirect
+from django.shortcuts import render, redirect
 
 __author__ = "hhyo"
 
@@ -19,15 +21,20 @@ from django.http import (
 from django.views.decorators.csrf import requires_csrf_token
 
 import common
-from archery.settings import GoogleOAuth
+from archery.settings import SERVICE_HOST, GoogleOAuth
 from sql.models import Users
 import datetime
 import logging
 
 
 def google_login(request):
-    redirect_uri = request.build_absolute_uri('/google-auth')
-    return GoogleOAuth.google.authorize_redirect(request, redirect_uri)
+    if GoogleOAuth:
+        url_raw = urlparse(request.build_absolute_uri('/google-auth'))
+        # replace netloc with SERVICE_HOST for avoiding different ports between python script and proxy
+        new_url = url_raw._replace(netloc=SERVICE_HOST).geturl()
+        return GoogleOAuth.google.authorize_redirect(request, new_url)
+    else:
+        return server_error_with_content(request, {"title": "Google OAuth未开启", "message": "请联系管理员修改配置文件，开启此功能。"})
 
 
 def google_auth(request):

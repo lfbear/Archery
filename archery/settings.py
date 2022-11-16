@@ -13,6 +13,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 env = environ.Env(
     DEBUG=(bool, False),
     ALLOWED_HOSTS=(List[str], ["*"]),
+    SERVICE_HOST=(str, "http://127.0.0.1:9123"),
     SECRET_KEY=(str, "hfusaf2m4ot#7)fkw#di2bu6(cv0@opwmafx5n#6=3d%x^hpl6"),
     DATABASE_URL=(str, "mysql://root:@127.0.0.1:3306/archery"),
     CACHE_URL=(str, "redis://127.0.0.1:6379/0"),
@@ -35,6 +36,8 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = env("DEBUG")
 
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
+
+SERVICE_HOST = env("SERVICE_HOST")
 
 # https://docs.djangoproject.com/en/4.0/ref/settings/#csrf-trusted-origins
 CSRF_TRUSTED_ORIGINS = env("CSRF_TRUSTED_ORIGINS")
