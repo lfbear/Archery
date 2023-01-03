@@ -183,6 +183,8 @@ def can_view(user, workflow_id):
             result = True
     return result
 
+def can_runonothers(user):
+    return user.has_perm("sql.view_sqlworkflow")
 
 def can_rollback(user, workflow_id):
     """

@@ -7,8 +7,8 @@
             <a target="_blank"
                href="{{ workflow_detail.demand_url }}">{{ workflow_detail.workflow_name }}</a>
         </h4>
-        <!--只允许发起人提交其他实例-->
-        {% if user.username == workflow_detail.engineer %}
+        <!--允许发起人和具备查看sql工单的人提交其他实例-->
+        {% if user.username == workflow_detail.engineer or is_can_runonothers %}
             <a type='button' id="btnSubmitOtherCluster" class='btn btn-warning' href="/submitotherinstance/">上线其他实例</a>
         {% endif %}
         {% if is_can_review or is_can_execute or is_can_rollback or user.is_superuser %}

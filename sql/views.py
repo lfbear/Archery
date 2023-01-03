@@ -41,6 +41,7 @@ from sql.utils.sql_review import (
     can_cancel,
     can_view,
     can_rollback,
+    can_runonothers,
 )
 from common.utils.const import Const, WorkflowDict
 from sql.utils.resource_group import user_groups, user_instances, auth_group_users
@@ -197,7 +198,8 @@ def detail(request, workflow_id):
         is_can_cancel = can_cancel(request.user, workflow_id)
         # 是否可查看回滚信息
         is_can_rollback = can_rollback(request.user, workflow_id)
-
+        # 是否可以在其他实例上再次运行
+        is_can_runonothers = can_runonothers(request.user)
         # 获取审核日志
         try:
             audit_detail = Audit.detail_by_workflow_id(
@@ -228,6 +230,7 @@ def detail(request, workflow_id):
         is_can_execute = False
         is_can_timingtask = False
         is_can_cancel = False
+        is_can_runonothers = False
         is_can_rollback = False
         last_operation_info = None
 
@@ -252,6 +255,7 @@ def detail(request, workflow_id):
         "is_can_execute": is_can_execute,
         "is_can_timingtask": is_can_timingtask,
         "is_can_cancel": is_can_cancel,
+        "is_can_runonothers": is_can_runonothers,
         "is_can_rollback": is_can_rollback,
         "audit_auth_group": audit_auth_group,
         "manual": manual,
