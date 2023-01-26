@@ -198,11 +198,11 @@ class MsgSender(object):
         send_url = qywx_webhook
 
         # 对链接进行转换
-        _msg = re.findall("https://.+(?=\n)|http://.+(?=\n)", msg)
-        for url in _msg:
-            # 防止如 [xxx](http://www.a.com)\n 的字符串被再次替换
-            if url.strip()[-1] != ")":
-                msg = msg.replace(url, "[请点击链接](%s)" % url)
+        # _msg = re.findall("https://.+(?=\n)|http://.+(?=\n)", msg)
+        # for url in _msg:
+        #     # 防止如 [xxx](http://www.a.com)\n 的字符串被再次替换
+        #     if url.strip()[-1] != ")":
+        #         msg = msg.replace(url, "[请点击链接](%s)" % url)
 
         data = {
             "msgtype": "markdown",

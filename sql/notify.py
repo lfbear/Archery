@@ -33,15 +33,15 @@ def __notify_cnf_status():
     feishu_webhook_status = sys_config.get("feishu_webhook")
     feishu_status = sys_config.get("feishu")
     if not any(
-        [
-            mail_status,
-            ding_status,
-            ding_webhook_status,
-            wx_status,
-            feishu_status,
-            feishu_webhook_status,
-            qywx_webhook_status,
-        ]
+            [
+                mail_status,
+                ding_status,
+                ding_webhook_status,
+                wx_status,
+                feishu_status,
+                feishu_webhook_status,
+                qywx_webhook_status,
+            ]
     ):
         logger.info("未开启任何消息通知，可在系统设置中开启")
         return False
@@ -69,7 +69,7 @@ def __send(msg_title, msg_content, msg_to, msg_cc=None, **kwargs):
         user.ding_user_id for user in chain(msg_to, msg_cc) if user.ding_user_id
     ]
     msg_to_wx_user = [
-        user.wx_user_id if user.wx_user_id else user.username
+        user.wx_user_id if user.wx_user_id else user.email.split("@")[0].replace(".","")
         for user in chain(msg_to, msg_cc)
     ]
     logger.info(f"{msg_to_email}{msg_cc_email}{msg_to_wx_user}{chain(msg_to, msg_cc)}")
@@ -93,8 +93,14 @@ def __send(msg_title, msg_content, msg_to, msg_cc=None, **kwargs):
             user.email for user in chain(msg_to, msg_cc) if not user.feishu_open_id
         ]
         msg_sender.send_feishu_user(msg_title, msg_content, open_id, user_mail)
+    # trigger user: msg_to_wx_user(a username list eg: ['admin'])
     if sys_config.get("qywx_webhook") and qywx_webhook:
-        msg_sender.send_qywx_webhook(qywx_webhook, msg_title + "\n" + msg_content)
+        mentioned = ""
+        if len(msg_to_wx_user) > 0:
+            for wx in msg_to_wx_user:
+                mentioned += "<@%s> " % wx
+            mentioned = "\n>请 " + mentioned + " 关注并及时处理该工单。"
+        msg_sender.send_qywx_webhook(qywx_webhook, msg_title + "\n" + msg_content + mentioned)
 
 
 def notify_for_audit(audit_id, **kwargs):
