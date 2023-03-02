@@ -314,9 +314,9 @@ def notify_for_execute(workflow):
             workflow.sqlworkflowcontent.sql_content[0:500].replace("\r", ""),
         ),
     )
-    # 邮件通知申请人，抄送DBA
+    # 邮件通知申请人
     msg_to = Users.objects.filter(username=workflow.engineer)
-    msg_cc = auth_group_users(auth_group_names=["DBA"], group_id=workflow.group_id)
+    msg_cc = None # auth_group_users(auth_group_names=["DBA"], group_id=workflow.group_id) # 抄送DBA
 
     # 处理接收人
     dingding_webhook = ResourceGroup.objects.get(
