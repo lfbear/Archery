@@ -3,6 +3,7 @@ import logging
 import re
 import traceback
 import MySQLdb
+import pymysql
 import simplejson as json
 
 from common.config import SysConfig
@@ -17,13 +18,9 @@ logger = logging.getLogger("default")
 class GoInceptionEngine(EngineBase):
     test_query = "INCEPTION GET VARIABLES"
 
-    @property
-    def name(self):
-        return "GoInception"
+    name = "GoInception"
 
-    @property
-    def info(self):
-        return "GoInception engine"
+    info = "GoInception engine"
 
     def get_connection(self, db_name=None):
         if self.conn:
@@ -39,9 +36,13 @@ class GoInceptionEngine(EngineBase):
         archer_config = SysConfig()
         go_inception_host = archer_config.get("go_inception_host")
         go_inception_port = int(archer_config.get("go_inception_port", 4000))
+        go_inception_user = archer_config.get("go_inception_user", "")
+        go_inception_password = archer_config.get("go_inception_password", "")
         self.conn = MySQLdb.connect(
             host=go_inception_host,
             port=go_inception_port,
+            user=go_inception_user,
+            passwd=go_inception_password,
             charset="utf8mb4",
             connect_timeout=10,
         )
@@ -63,6 +64,10 @@ class GoInceptionEngine(EngineBase):
             autocommit=True,
         )
 
+    def escape_string(self, value: str) -> str:
+        """字符串参数转义"""
+        return pymysql.escape_string(value)
+
     def execute_check(self, instance=None, db_name=None, sql=""):
         """inception check"""
         # 判断如果配置了隧道则连接隧道
@@ -71,7 +76,10 @@ class GoInceptionEngine(EngineBase):
         # inception 校验
         check_result.rows = []
         variables, set_session_sql = get_session_variables(instance)
-        inception_sql = f"""/*--user='{user}';--password='{password}';--host='{host}';--port={port};--check=1;*/
+        # 获取real_row_count参数选项
+        real_row_count = SysConfig().get("real_row_count", False)
+        real_row_count_option = "--real_row_count=true;" if real_row_count else ""
+        inception_sql = f"""/*--user='{user}';--password='{password}';--host='{host}';--port={port};--check=1;{real_row_count_option}*/
                             inception_magic_start;
                             {set_session_sql}
                             use `{db_name}`;
@@ -282,8 +290,8 @@ class GoInceptionEngine(EngineBase):
 
     def osc_control(self, **kwargs):
         """控制osc执行，获取进度、终止、暂停、恢复等"""
-        sqlsha1 = MySQLdb.escape_string(kwargs.get("sqlsha1")).decode("utf-8")
-        command = MySQLdb.escape_string(kwargs.get("command")).decode("utf-8")
+        sqlsha1 = self.escape_string(kwargs.get("sqlsha1", ""))
+        command = self.escape_string(kwargs.get("command", ""))
         if command == "get":
             sql = f"inception get osc_percent '{sqlsha1}';"
         else:
